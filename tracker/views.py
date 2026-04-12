@@ -1,7 +1,10 @@
 from django.shortcuts import render,redirect
+from django.contrib.auth.decorators import login_required
 from .models import Category,Transactions
 from django.db.models import Sum
 
+
+@login_required
 def dashboard(request):
     transactions=Transactions.objects.all().order_by('-date')
 
@@ -15,14 +18,26 @@ def dashboard(request):
 
     balance=total_income-total_expenses
 
+    expense_by_category = (
+        transactions.filter(transaction_type='expense')
+        .values('category__name')
+        .annotate(total=Sum('amount'))
+    )
+
+    chart_labels = [item['category__name'] or 'Uncategorized' for item in expense_by_category]
+    chart_data = [float(item['total']) for item in expense_by_category]
+
     return render(request,'tracker/dashboard.html',{
         'transactions':transactions,
         'total_income':total_income,
         'total_expenses':total_expenses,
-        'balance':balance
+        'balance':balance,
+        'chart_labels':chart_labels,
+        'chart_data':chart_data
+        
     })
 
-
+@login_required
 def add_transaction(request):
     if(request.method=='POST'):
         title=request.POST['title']
@@ -47,6 +62,7 @@ def add_transaction(request):
     categories=Category.objects.all()
     return render(request,'tracker/add_transaction.html', {'categories':categories})
 
+@login_required
 def delete_transaction(request):
     transaction=Transactions.objects.get(id=pk)
     transaction.delete()
