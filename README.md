@@ -45,9 +45,10 @@ budgettingApp/
 │   ├── views.py
 │   ├── urls.py
 │   └── admin.py
-├── Dockerfile
-├── docker-compose.yml
-├── .dockerignore
+├── dockerSettings/         # Docker configuration
+│   ├── Dockerfile
+│   ├── docker-compose.yml
+│   └── .dockerignore
 ├── manage.py
 ├── requirements.txt
 └── .gitignore
@@ -75,21 +76,21 @@ cd BudgetingApp
 
 2. Make sure Docker Desktop is running, then build and start the app:
 ```bash
-docker-compose build
-docker-compose run web python manage.py migrate
-docker-compose up
+docker-compose -f dockerSettings/docker-compose.yml build
+docker-compose -f dockerSettings/docker-compose.yml run web python manage.py migrate
+docker-compose -f dockerSettings/docker-compose.yml up
 ```
 
 3. Visit **http://127.0.0.1:8000** in your browser.
 
 4. To create a superuser for admin access:
 ```bash
-docker-compose run web python manage.py createsuperuser
+docker-compose -f dockerSettings/docker-compose.yml run web python manage.py createsuperuser
 ```
 
 5. To stop the app:
 ```bash
-docker-compose down
+docker-compose -f dockerSettings/docker-compose.yml down
 ```
 
 ---
@@ -142,7 +143,7 @@ After setup, populate the database with default categories via the Django shell:
 python manage.py shell
 
 # Docker
-docker-compose run web python manage.py shell
+docker-compose -f dockerSettings/docker-compose.yml run web python manage.py shell
 ```
 
 Then paste:
