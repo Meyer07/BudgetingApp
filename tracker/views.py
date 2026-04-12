@@ -1,5 +1,7 @@
 from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login
 from .models import Category,Transactions
 from django.db.models import Sum
 
@@ -63,9 +65,18 @@ def add_transaction(request):
     return render(request,'tracker/add_transaction.html', {'categories':categories})
 
 @login_required
-def delete_transaction(request):
-    transaction=Transactions.objects.get(id=pk)
+def delete_transaction(request, pk):
+    transaction = Transactions.objects.get(id=pk, user=request.user)
     transaction.delete()
     return redirect('dashboard')
 
-
+def signup(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('dashboard')
+    else:
+        form = UserCreationForm()
+    return render(request, 'registration/signup.html', {'form': form})
