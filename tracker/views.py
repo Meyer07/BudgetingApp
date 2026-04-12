@@ -9,13 +9,14 @@ import json
 
 @login_required
 def dashboard(request):
-    transactions=Transactions.objects.all().order_by('-date')
 
-    total_income=Transactions.objects.filter(
+    transactions = Transactions.objects.filter(user=request.user).order_by('-date')
+
+    total_income=transactions.filter(
         transaction_type='income'
     ).aggregate(Sum('amount'))['amount__sum'] or 0
 
-    total_expenses=Transactions.objects.filter(
+    total_expenses=transactions.filter(
         transaction_type='expense'
     ).aggregate(Sum('amount'))['amount__sum'] or 0
 
@@ -53,6 +54,7 @@ def add_transaction(request):
         category=Category.objects.get(id=category_id,) if category_id else None
 
         Transactions.objects.create(
+            user=request.user,
             title=title,
             amount=amount,
             transaction_type=transaction_type,
