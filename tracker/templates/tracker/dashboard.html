@@ -32,10 +32,12 @@
 <div class="card p-4 mb-4">
     <h5 class="mb-3">Spending by Category</h5>
     {% if chart_data %}
-        <canvas id="expenseChart" height="100"></canvas>
+        <div style="max-width: 400px; margin: auto;">
+            <canvas id="expenseChart"></canvas>
+        </div>
         <div id="chartData"
-             data-labels='{{ chart_labels|safe }}'
-             data-values='{{ chart_data|safe }}'
+             data-labels='{{ chart_labels }}'
+             data-values='{{ chart_data }}'
              style="display:none;">
         </div>
     {% else %}
@@ -77,34 +79,35 @@
     </tbody>
 </table>
 
-<!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
-    const chartDataEl = document.getElementById('chartData');
-    if (chartDataEl) {
-        const labels = JSON.parse(chartDataEl.dataset.labels);
-        const values = JSON.parse(chartDataEl.dataset.values);
-        const ctx = document.getElementById('expenseChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: labels,
-                datasets: [{
-                    data: values,
-                    backgroundColor: [
-                        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
-                        '#9966FF', '#FF9F40', '#E7E9ED', '#71B37C'
-                    ],
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { position: 'right' }
+    window.addEventListener('load', function() {
+        const chartDataEl = document.getElementById('chartData');
+        const canvas = document.getElementById('expenseChart');
+        if (chartDataEl && canvas) {
+            const labels = JSON.parse(chartDataEl.dataset.labels);
+            const values = JSON.parse(chartDataEl.dataset.values);
+            new Chart(canvas, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: [
+                            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+                            '#9966FF', '#FF9F40', '#E7E9ED', '#71B37C'
+                        ],
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'right' }
+                    }
                 }
-            }
-        });
-    }
+            });
+        }
+    });
 </script>
 
 {% endblock %}

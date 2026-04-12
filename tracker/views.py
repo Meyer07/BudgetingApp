@@ -4,6 +4,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from .models import Category,Transactions
 from django.db.models import Sum
+import json
 
 
 @login_required
@@ -26,8 +27,8 @@ def dashboard(request):
         .annotate(total=Sum('amount'))
     )
 
-    chart_labels = [item['category__name'] or 'Uncategorized' for item in expense_by_category]
-    chart_data = [float(item['total']) for item in expense_by_category]
+    chart_labels = json.dumps([item['category__name'] or 'Uncategorized' for item in expense_by_category])
+    chart_data = json.dumps([float(item['total']) for item in expense_by_category])
 
     return render(request,'tracker/dashboard.html',{
         'transactions':transactions,
