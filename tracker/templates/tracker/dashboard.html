@@ -1,0 +1,63 @@
+{% extends "tracker/base.html" %}
+{% block content %}
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h5>Total Income</h5>
+                <h3>${{ total_income }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-danger">
+            <div class="card-body">
+                <h5>Total Expenses</h5>
+                <h3>${{ total_expenses }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h5>Balance</h5>
+                <h3>${{ balance }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<table class="table table-striped bg-white">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Amount</th>
+            <th>Type</th>
+            <th>Category</th>
+            <th>Date</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for t in transactions %}
+        <tr>
+            <td>{{ t.title }}</td>
+            <td>${{ t.amount }}</td>
+            <td>
+                <span class="badge {% if t.transaction_type == 'income' %}bg-success{% else %}bg-danger{% endif %}">
+                    {{ t.transaction_type }}
+                </span>
+            </td>
+            <td>{{ t.category }}</td>
+            <td>{{ t.date }}</td>
+            <td>
+                <a href="/delete/{{ t.id }}/" class="btn btn-sm btn-danger">Delete</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="text-center">No transactions yet.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
