@@ -1,0 +1,68 @@
+{% extends "tracker/base.html" %}
+{% block content %}
+
+<h4 class="mb-4">💰 Budget Goals — {{ current_month }}</h4>
+
+<!-- Add Budget Form -->
+<div class="card p-4 mb-4">
+    <h5 class="mb-3">Set a Budget</h5>
+    <form method="POST">
+        {% csrf_token %}
+        <div class="row g-3">
+            <div class="col-md-5">
+                <label>Category</label>
+                <select name="category" class="form-control">
+                    {% for cat in categories %}
+                    <option value="{{ cat.id }}">{{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label>Monthly Limit ($)</label>
+                <input type="number" name="amount" step="0.01" class="form-control" required>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-success w-100">Set Budget</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Budget Progress Bars -->
+<div class="card p-4">
+    <h5 class="mb-4">This Month's Progress</h5>
+    {% if budget_data %}
+        {% for b in budget_data %}
+        <div class="mb-4">
+            <div class="d-flex justify-content-between mb-1">
+                <strong>{{ b.category }}</strong>
+                <span>${{ b.spent }} / ${{ b.limit }}
+                    <a href="/budgets/delete/{{ b.budget_id }}/"
+                       class="btn btn-sm btn-outline-danger ms-2 py-0">✕</a>
+                </span>
+            </div>
+            <div class="progress" style="height: 22px;">
+                <div class="progress-bar bg-{{ b.color }}"
+                     role="progressbar"
+                     style="width: {{ b.percentage }}%;"
+                     aria-valuenow="{{ b.percentage }}"
+                     aria-valuemin="0"
+                     aria-valuemax="100">
+                    {{ b.percentage }}%
+                </div>
+            </div>
+            {% if b.percentage >= 90 %}
+                <small class="text-danger">⚠️ You're close to or over your budget!</small>
+            {% elif b.percentage >= 60 %}
+                <small class="text-warning">📊 You've used more than half your budget.</small>
+            {% else %}
+                <small class="text-success">✅ You're on track!</small>
+            {% endif %}
+        </div>
+        {% endfor %}
+    {% else %}
+        <p class="text-muted">No budget goals set for this month yet.</p>
+    {% endif %}
+</div>
+
+{% endblock %}

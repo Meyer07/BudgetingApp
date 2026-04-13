@@ -2,8 +2,9 @@ from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
-from .models import Category,Transactions
+from .models import Category,Transactions,Budget
 from django.db.models import Sum
+from datetime import date
 import json
 
 
@@ -48,7 +49,7 @@ def add_transaction(request):
         amount=request.POST['amount']
         transaction_type=request.POST['transaction_type']
         category_id=request.POST.get('category')
-        date=request.POST['date']
+        transaction_date=request.POST['date']
         notes=request.POST.get('notes','')
 
         category=Category.objects.get(id=category_id,) if category_id else None
@@ -59,7 +60,7 @@ def add_transaction(request):
             amount=amount,
             transaction_type=transaction_type,
             category=category,
-            date=date,
+            date=transaction_date,
             notes=notes
         )
         return redirect('dashboard')
@@ -83,3 +84,69 @@ def signup(request):
     else:
         form = UserCreationForm()
     return render(request, 'registration/signup.html', {'form': form})
+
+@login_required
+def budget_goals(request):
+    today=date.today()
+    current_month=today.month
+    current_year=today.year
+
+    if request.method=='POST':
+        category_id=request.POST.get('category')
+        amount=request.POST.get('amount')
+        category=Category.objects.get(id=category_id)
+
+        Budget.objects.update_or_create(
+            user=request.user,
+            category=category,
+            month=current_month,
+            year=current_year,
+            defaults={'amount':amount}
+        )
+        return redirect('budget_goals')
+    
+    categories=Category.objects.all()
+    budgets=Budget.objects.filter(user=request.user, month=current_month,year=current_year)
+
+    budget_data=[]
+
+    for budget in budgets:
+        result=Transactions.objects.filter(
+            user=request.user,
+            category=budget.category,
+            transaction_type='expense',
+            date__year=current_year,
+            date__month=current_month
+
+        ).aggregate(total=Sum('amount'))
+
+        spent=result.get('total') or 0
+
+        percentage=min(int((float(spent) / float(budget.amount)) * 100), 100)
+
+        if percentage >= 90:
+            color = 'danger'
+        elif percentage >= 60:
+            color = 'warning'
+        else:
+            color = 'success'
+
+        budget_data.append({
+            'category': budget.category.name,
+            'limit': budget.amount,
+            'spent': spent,
+            'percentage': percentage,
+            'color': color,
+            'budget_id': budget.id,
+        })
+    return render(request, 'tracker/budget_goals.html', {
+        'categories': categories,
+        'budget_data': budget_data,
+        'current_month': today.strftime('%B %Y'),
+    })
+@login_required
+def delete_budget(request,pk):
+    budget=Budget.objects.get(id=pk,user=request.user)
+    budget.delete()
+    return redirect('budget_goals')
+

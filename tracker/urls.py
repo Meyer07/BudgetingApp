@@ -6,4 +6,6 @@ urlpatterns=[
     path('add/',views.add_transaction,name='add_transaction'),
     path('delete/<int:pk>/', views.delete_transaction, name='delete_transaction'),
     path('signup/', views.signup, name='signup'),
+    path('budgets/', views.budget_goals, name='budget_goals'),        
+    path('budgets/delete/<int:pk>/', views.delete_budget, name='delete_budget'),  
 ]

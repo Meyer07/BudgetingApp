@@ -10,6 +10,7 @@
     <nav class="navbar navbar-dark bg-dark px-4">
         <a class="navbar-brand" href="/">💰 Budget Tracker</a>
         <div>
+            <a href="/budgets/" class="btn btn-outline-light btn-sm me-2">🎯 Budget Goals</a>
             <a href="/add/" class="btn btn-success btn-sm me-2">+ Add Transaction</a>
             <form method="POST" action="/accounts/logout/" style="display:inline;">
                 {% csrf_token %}
