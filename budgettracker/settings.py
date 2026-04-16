@@ -27,6 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     "budgeting-app-seven-xi.vercel.app",
+    'budgeting-8vy5xidba-meyer07s-projects.vercel.app',
 ]
 
 
