@@ -25,7 +25,9 @@ SECRET_KEY = 'django-insecure-e!^7kydz70914lvd!v-2e8c3ybptb+&t131^8ezvlp7dq5uj0f
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "budgeting-app-seven-xi.vercel.app",
+]
 
 
 # Application definition
